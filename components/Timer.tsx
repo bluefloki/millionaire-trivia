@@ -8,5 +8,9 @@ export default function Timer() {
   // state
   const { timeLeft } = useTimerStore();
 
-  return <div>Timer: {formatTime(timeLeft)}</div>;
+  return (
+    <div className="text-lg md:text-xl gradient-text text-center absolute w-full">
+      Time Left: {formatTime(timeLeft)}s
+    </div>
+  );
 }

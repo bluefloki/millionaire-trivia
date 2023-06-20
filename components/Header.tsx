@@ -9,7 +9,7 @@ type Props = {
 
 export default function Header({ questionNumber }: Props) {
   return (
-    <div className="flex flex-row items-center justify-between w-full md:w-1/2">
+    <div className="flex flex-row items-center justify-between w-full md:w-1/2 relative">
       <h2 className="text-left font-semibold text-2xl md:text-3xl text-[#98A2C8] py-4">
         <span className="hidden md:inline-block">Question</span>{" "}
         {questionNumber} / 10
