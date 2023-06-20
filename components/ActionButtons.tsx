@@ -24,7 +24,7 @@ export default function ActionButtons({
             "btn w-full border-2 btn-primary disabled:invisible"
           )}
         >
-          Submit
+          Check Answer
         </button>
       ) : (
         // Continue Button when game = paused

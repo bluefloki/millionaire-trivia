@@ -12,3 +12,8 @@ export const shuffleArray = (array: any[]) => {
 export const formatNumberWithCommas = (numberString: string) => {
   return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
+export const formatTime = (seconds: number) => {
+  const formattedSeconds = String(seconds).padStart(2, "0");
+  return formattedSeconds;
+};

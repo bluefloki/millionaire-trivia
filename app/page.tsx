@@ -8,12 +8,14 @@ import { shuffleArray } from "@/lib/helpers";
 import GameEnded from "@/components/GameEnded";
 import Header from "@/components/Header";
 import ActionButtons from "@/components/ActionButtons";
+import useTimerStore from "@/lib/stores/timerStore";
 
 export default function Home() {
   // state
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [question, setQuestion] = useState<string>("");
   const [questionNumber, setQuestionNumber] = useState<number>(1);
+  const [questionsAnswered, setQuestionsAnswered] = useState<number>(0);
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [incorrectAnswers, setIncorrectAnswers] = useState([]);
   const answers = useMemo(
@@ -22,8 +24,13 @@ export default function Home() {
   );
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [gameEnded, setGameEnded] = useState(false);
-  const [gamePaused, setGamePaused] = useState(false);
+  const [gamePaused, setGamePaused] = useState(true);
   const [difficulty, setDifficulty] = useState("easy");
+
+  let interval: any = null;
+
+  // global state
+  const { timeLeft, setTimeLeft, decrementTime } = useTimerStore();
 
   // functions
   // function that fetches questions and their answers
@@ -51,6 +58,9 @@ export default function Home() {
   const checkAnswer = () => {
     // revealing the correct answer
     setGamePaused(true);
+
+    // updating answered questions
+    if (selectedAnswer == correctAnswer) setQuestionsAnswered((n) => n + 1);
   };
 
   // function that continues game after pausing
@@ -70,6 +80,8 @@ export default function Home() {
     else if (selectedAnswer == correctAnswer && questionNumber < 11)
       getQuestion(difficulty);
 
+    //reset timer
+    setTimeLeft(30);
     setGamePaused(false);
   };
 
@@ -77,13 +89,40 @@ export default function Home() {
   const restartGame = () => {
     getQuestion("easy");
     setGameEnded(false);
+    setTimeLeft(30);
     setQuestionNumber(1);
+    setQuestionsAnswered(0);
   };
 
+  // fetching questions and answers
   useEffect(() => {
-    // fetching questions and answers
     getQuestion("easy");
+    setGamePaused(false);
   }, []);
+
+  // timer setup
+  useEffect(() => {
+    // start timer when game is running
+    if (gamePaused === false && timeLeft > 0) {
+      interval = setInterval(() => {
+        decrementTime();
+      }, 1000);
+    }
+
+    // if game ends because of winning
+    if (gameEnded) clearInterval(interval);
+
+    // stop timer when time runs out
+    if (timeLeft === 0) {
+      clearInterval(interval);
+      setGameEnded(true);
+    }
+
+    // cleanup
+    return () => {
+      clearInterval(interval);
+    };
+  }, [gamePaused, timeLeft, restartGame]);
 
   // If loading
   if (isLoading === true || question == undefined)
@@ -96,7 +135,10 @@ export default function Home() {
   // if the game has ended
   if (questionNumber == 11 || gameEnded) {
     return (
-      <GameEnded questionNumber={questionNumber} restartGame={restartGame} />
+      <GameEnded
+        questionsAnswered={questionsAnswered}
+        restartGame={restartGame}
+      />
     );
   }
 
