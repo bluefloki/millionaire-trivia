@@ -1,5 +1,5 @@
 import { dollarAmounts } from "@/lib/dollarAmounts";
-import { formatNumberWithCommas } from "@/lib/helpers";
+import { formatNumberForMobile, formatNumberWithCommas } from "@/lib/helpers";
 import React from "react";
 import Timer from "./Timer";
 
@@ -8,6 +8,8 @@ type Props = {
 };
 
 export default function Header({ questionNumber }: Props) {
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
   return (
     <div className="flex flex-row items-center justify-between w-full md:w-1/2 relative">
       <h2 className="text-left font-semibold text-2xl md:text-3xl text-[#98A2C8] py-4">
@@ -16,7 +18,10 @@ export default function Header({ questionNumber }: Props) {
       </h2>
       <Timer />
       <p className="text-xl md:text-2xl font-semibold text-center gradient-text">
-        ${`${formatNumberWithCommas(dollarAmounts[questionNumber])}`}
+        $
+        {isMobile
+          ? formatNumberForMobile(dollarAmounts[questionNumber])
+          : formatNumberWithCommas(dollarAmounts[questionNumber])}
       </p>
     </div>
   );
